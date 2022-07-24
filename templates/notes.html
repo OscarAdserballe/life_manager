@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Notes
+{% endblock %}
+
+{% block header %}
+    <h2 class="text-uppercase text-letter-spacing-xs my-0 text-primary font-weight-bold text-center">
+        Notes
+    </h2>
+    <p>&nbsp;</p>
+    <hr style="margin: auto; width: 80%;">
+{% endblock %}
+
+{% block main %}
+    <p>&nbsp;</p>
+    <form action="/notes" method="post" style="width: 70%; margin : auto;" class="row">
+        <textarea name="note" type="text" style="border-radius: 10px; height: 200px;" class="form-control form-control-lg" placeholder="Add new note..."></textarea>
+        <button type="submit" name="submit_note" class="bg-light" style="border-radius: 10px;">Add</button>
+    </form>
+    <p>&nbsp;</p>
+    <hr style="margin: auto; width : 80%;">
+    <p>&nbsp;</p>
+    
+    <div style="width: 60%; text-align: center; margin: auto;">
+        {% for note in notes %}
+            <div id="note" style="border-radius: 20px;" class="card">
+                <div id="text" style="width: 600px; align-self: center;">
+                    <p style="text-align: justify; font-family: Open Sans; font-size: 20px;">
+                        {{ note[1] }}
+                    </p>
+                    <p>&nbsp</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

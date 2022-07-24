@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Video Notes
+{% endblock %}
+
+{% block header %}
+    <h2 class="text-uppercase text-letter-spacing-xs my-0 text-primary font-weight-bold text-center">
+        Video Notes
+    </h2>
+    <p>&nbsp;</p>
+    <hr width="70%" style="margin: auto;">
+    <p>&nbsp;</p>
+{% endblock %}
+
+
+{% block main %}
+    <div style="width: 60%; text-align: center; margin: auto;">
+    {% for note in notes %}
+        <div id="note" style="border-radius: 20px;" class="card">
+            <div id="text" style="width: 600px; align-self: center;">
+                <p style="font-weight: bold; font-family: Open Sans; font-size: 20px;">{{ note[1] }}</p>
+                <a href="{{ note[0][1] }}"><img style="border-radius: 10px;" src={{ note[0][0] }}></a>
+                <p>&nbsp</p>
+                <!--pure html, so have to format it with |safe-->
+                {% if note[2] %}
+                    {{ note[2]|safe }}
+                {% endif %}
+
+                
+                {% for i in note[6] %}
+                    <p style="text-align: justify; font-family: Open Sans; font-size: 20px;">
+                        <span class="blue"><u>{{ i }}</u></span> : {{ note[6][i] }}
+                    </p>
+                    <p>&nbsp</p>
+                {% endfor %}
+
+                <p>&nbsp;</p>
+            </div>
+        </div>
+        <p>&nbsp;</p>
+        
+    {% endfor %}
+    </div>
+    <footer class="mb-5 small text-center text-muted">
+        API Data taken from <a href="https://www.tuberslab.com/">TubersLab</a>
+    </footer>
+{% endblock %}

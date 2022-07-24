@@ -1,0 +1,7 @@
+pandas
+json
+requests
+sqlite3
+os
+Flask
+datetime
