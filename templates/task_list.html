@@ -27,7 +27,7 @@ Task List
             {% if task[4]==0 %}
                 <li class="d-inline-flex p-2">
                     <p>&nbsp;&nbsp;&nbsp;&nbsp;</p>
-                    <p style="font-size: 24px;">{{ task[1] }}</p>
+                    <p style="font-size: 24px;">{{ task[3] }}</p>
                     <p>&nbsp;&nbsp;&nbsp;&nbsp;</p>
                     <form action="/task_list" method="post">
                         <button type="submit" value={{ task[0] }} name="delete" class="btn btn-outline-white bg-white">

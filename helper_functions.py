@@ -1,3 +1,5 @@
+# creating requirements.txt using
+# pipreqs C:\Users\32470\OneDrive\"Coding Projects"\"Life Manager"
 import pandas as pd
 import json
 import requests
@@ -11,72 +13,44 @@ import time
 import calendar
 import matplotlib as mpl
 import socket
+from functools import wraps
+import ast
 
 # implementing similarity metric
 from difflib import SequenceMatcher
 
 
 
-
+# similarity metric
 def similar(a, b):
     return SequenceMatcher(None, a, b).ratio()
 
 # creating table that will store time entries
 # from time_tracker.pyw
 # remember to update desktop version of time_tracker.pyw
-ACTIVITES = {
-    "Coding" : [["Code.exe"], False],
-    "Email" : [["mail.google.com", "outlook.office.com"], False],
-    "Desktop" : [["explorer.exe"], False],
-    "Notion" : [["Notion.exe"], False],
-    "Browsing" : [["chrome.exe"], False],
-    "YouTube" : [["YouTube"], False],
-    "Netflix" : [["Netflix"], False],
-    "Research" : [[".pdf"], False]
+ACTIVITIES = {
+    "Coding" : ["Code.exe", "GitHub"],
+    "Email" : ["mail.google.com", "outlook.office.com"], 
+    "Desktop" : ["explorer.exe"], 
+    "Notion" : ["Notion.exe", "notion.so"],
+    "Browsing" : ["chrome.exe"],
+    "YouTube" : ["YouTube"],
+    "Streaming" : ["Netflix", "primevideo.com", "Prime Video", "HBO"],
+    "Research" : [".pdf", "Acrobat.exe"], 
+    "E-Learning" : ["coursera.org", "edx.org"], 
+    "Else" : ["Unrecognizable gibberish skdjfasjd;fds"]
 }
 
 # quick way to transport activities dict to other files that need it, though doesn't
 # work with time_tracker.pyw
 def return_activities_dict():
-    return ACTIVITES
+    return ACTIVITIES
 
 conn = sqlite3.connect("app_database")
 c = conn.cursor()
 
+# columns in time_tracker
 TIME_TRACKER_COLUMNS = ["date", "time", "window_name", "app", "activities", "link"]
-
-# create time_tracker table
-def create_db():
-    # event characterised by id, date, time_started, window_name, link (if chrome)
-    c.execute("CREATE TABLE IF NOT EXISTS time_tracker (date DATE NOT NULL,\
-            time TIME NOT NULL, window_name TEXT NOT NULL, app TEXT, activities TEXT, link TEXT);")
-    conn.commit()
-    return 0
-
-# create calendar table
-def create_calendar_db():
-    c.execute("CREATE TABLE IF NOT EXISTS calendar (date DATE NOT NULL,\
-            time TIME NOT NULL, description TEXT NOT NULL);")
-    conn.commit()
-    return 0
-
-# create video_notes table
-def create_yt_db():
-    c.execute("CREATE TABLE IF NOT EXISTS video_notes (thumbnail TEXT, title TEXT, \
-            summary_html_format TEXT, updated_at TEXT, created_at TEXT, id INTEGER, notes TEXT PRIMARY KEY);")
-    conn.commit()
-    return 0
-
-def create_task_list_db():
-    c.execute("CREATE TABLE IF NOT EXISTS task_list (id INTEGER AUTO_INCREMENT, task TEXT NOT NULL, time_created DATETIME, time_deleted DATETIME, done INTEGER, deadline DATETIME);")
-    conn.commit()
-    return 0
-
-def create_notes_db():
-    c.execute("CREATE TABLE IF NOT EXISTS notes (id INTEGER AUTO_INCREMENT, note TEXT NOT NULL, time_created DATETIME);")
-    conn.commit()
-    return 0
-
 
 # update video_notes table
 def update_db():
@@ -159,7 +133,7 @@ def update_db():
     raw_data_json = json_format["notes"]
     #iterating through list
     #creating dataframe
-    
+    id_counter = 1
     for note_group in raw_data_json:
         # note_texts and time_stamps contained in list
         raw_notes = json.loads(note_group["notes"])
@@ -173,18 +147,12 @@ def update_db():
             notes[time_stamp] = note_text
         
         #all data needed from request
-        c.execute("INSERT OR REPLACE INTO video_notes (thumbnail, title, summary_html_format, updated_at, created_at, id, notes) VALUES (?, ?, ?, ?, ?, ?, ?);", (note_group["medium_thumbnail"], note_group["title"], note_group["html_summary"], note_group["updated_at"], note_group["created_at"], int(note_group["id"]), str(notes)))
+        c.execute("INSERT OR REPLACE INTO video_notes (id, user_id, thumbnail, title, created, updated, summary, notes, hide)\
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", (note_group["video_id"], 1, note_group["medium_thumbnail"], note_group["title"], note_group["created_at"], note_group["updated_at"], note_group["html_summary"], str(notes), 0))
         conn.commit()
-    """data = {
-        "thumbnail" : note_group["medium_thumbnail"],
-        "title" : note_group["title"],
-        "summary_html_format" : note_group["html_summary"],
-        "updated_at" : note_group["updated_at"],
-        "created_at" : note_group["created_at"],
-        "video_id" : note_group["video_id"],
-        "id" : note_group["id"],
-        "notes" : notes
-    }"""
+
+        id_counter += 1
+
     return 0
 
 
@@ -192,10 +160,6 @@ def update_db():
 def get_db(date="all", category=None, ascending=False):
     conn = sqlite3.connect("app_database")
     c = conn.cursor()
-
-    #print(formatted_date)
-    
-    
 
     if ascending:
         if date == "all":
@@ -206,7 +170,7 @@ def get_db(date="all", category=None, ascending=False):
             conn.commit()
     else:
         if date == "all":
-            time_data = c.execute("SELECT * FROM time_tracker ORDER BY time DESC;")
+            time_data = c.execute("SELECT * FROM time_tracker ORDER BY date DESC, time DESC;")
             conn.commit()
         else:
             time_data = c.execute("SELECT * FROM time_tracker WHERE date=? ORDER BY time DESC;", (date, ))
@@ -237,154 +201,19 @@ def get_db(date="all", category=None, ascending=False):
     return list_of_rows
     
 
-# app taken every 10 secs. If the same across intervals, merge two together.
-def merge_data(db):
-    # assuming db has the form of list of lists
-
-    new_db = []
-    # storing prev_entry to compare app against
-    prev_entry = []
-    counter = 0
-
-    for i in db:
-        # storing initial var
-        if prev_entry == []:
-            prev_entry = i
-        else:
-            # if third entry in each list is similar enough (90% resemblance) to prev., merge
-            # 
-            # print(prev_entry[2], i[2], "Similarity : ", similar(prev_entry[2], i[2]))
-            if similar(prev_entry[2], i[2]) >= 0.9:
-                
-                # also, only merge if less than an hour between the two
-                if (to_seconds(i[1]) - to_seconds(prev_entry[1])) < 3600:
-                    # print(to_seconds(i[1]) - to_seconds(prev_entry[1]))
-                # if they are equal, update time_stamp to last one
-                    #print(to_seconds(i[1]) - to_seconds(prev_entry[1]))
-                    prev_entry[1] = i[1]        
-            # else, new one, so append prev. one as it cannot be merged further
-            else:
-                # print("Appending", prev_entry)
-                new_db.append(prev_entry)
-                prev_entry = i
-        
-        counter += 1
-
-    # finally, store the last entry
-    new_db.append(prev_entry)
-
-    # creating new table for it and deleting prev. one to save storage
-    # without losing information
-
-    # just in case, creating backup that is deleted at the end of func
-    c.execute("CREATE TABLE backup AS SELECT * FROM time_tracker;")
-    conn.commit()
-
-    succesful = c.execute("DROP TABLE time_tracker;")
-
-    # deleting entries somehow doesn't disturb the background program
-    conn.commit()
-
-    create_db()
-    conn.commit()
-
-    for entry in new_db:
-        try:
-            c.execute("INSERT INTO time_tracker (date, time, window_name, app, activities, link) VALUES\
-                (?, ?, ?, ?, ?, ?);", (entry))
-            conn.commit()
-        except:
-            print(entry)
-    
-    # deleting temporary safeguard now that the new one has been created
-    c.execute("DROP TABLE backup;")
-    conn.commit()
-    return new_db
-
-# group something like Chrome activity into "Web browsing",
-# vs code in "Coding" etc.
-# ultimately, for gantt chart using matplotlib
-# taking db as list_of_lists
-def classify_data(db):
-    # assuming db as list_of_lists
-
-    # storing possible activities-groups
-    # not mutually exclusive
-    # entertainment, i.e. youtube and web browsing will overlap
-    # stored along with their identifier
-    # for example, youtube by "youtube.com" in link
-    # obviously not full-proof, but it should be decent
-
-    df = pd.DataFrame(db, columns=TIME_TRACKER_COLUMNS)
-    
-    
-    categorised_dict = {}
-    for i in ACTIVITES.keys():
-        categorised_dict[i] = []
-
-    """
-    Loop through each entry
-        Loop through each possible activity
-            If identifier contained in window, app or link
-                If active_status is False
-                    Store time_start in list in df as ["Start", date, time of current entry checked]
-                    active = True
-                Else:
-                    pass
-            Else
-                If active_status is True
-                    store time_end in df as ["End", date, time of current entry checked]
-                    active = False
-        
-    """
-    for i in range(df.shape[0]):
-        
-        for j in categorised_dict:
-            
-            activity_name = j
-            activity_identifiers = ACTIVITES[activity_name][0]
-            active_status = ACTIVITES[activity_name][1]
-
-            for activity_identifier in activity_identifiers:
-                # print(activity_identifier, df["window_name"][i], activity_identifier in df["window_name"][i], df["app"][i], activity_identifier in df["app"][i], df["link"][i], activity_identifier in df["link"][i])
-                if (activity_identifier in df["window_name"][i]) or (activity_identifier in df["app"][i]) or (activity_identifier in df["link"][i]):
-                    # debug 
-                    # print("Present", activity_identifier, df["window_name"][i], df["app"][i], df["link"][i])
-                    if active_status == False:
-                        categorised_dict[activity_name].append(["Start", df["date"][i], df["time"][i]])
-                        ACTIVITES[activity_name][1] = True
-                        break
-                
-                # only triggers if last iteration of identifiers. Otherwise, it could run into some funky scenarios.
-                else:
-                    if activity_identifier == activity_identifiers[-1]:
-                        # debug
-                        # print("Missing", activity_identifier, df["window_name"][i], df["app"][i], df["link"][i])
-                        # print(activity_identifier in df["link"][i], type(str(df["link"][i])))
-
-                        if active_status == True:
-                            categorised_dict[activity_name].append(["End", df["date"][i], df["time"][i]])
-                            ACTIVITES[activity_name][1] = False
-
-    return categorised_dict
-
-
 now = datetime.now()
 today = now.strftime("%Y-%m-%d")
+current_time = now.strftime("%H:%M:%S")
 
 # gantt_chart visualisatino of time_tracker table
-def gantt_chart(date, categorised_data, hour_minute="", start_hour="", end_hour="", show=False):
+def gantt_chart(date, db, hour_minute="", start_hour="", end_hour="", show=False):
     # assuming categorised_data as dict with keys of activities
 
     # safeguard in case category is selected on time_tracker
     if date == "all":
         date = today
 
-
-    activities = categorised_data.keys()
-
-    y_counter = 0
-
+    activities = list(ACTIVITIES.keys())
 
     ##### customising figure ###
     fig, ax = plt.subplots(1)
@@ -393,7 +222,7 @@ def gantt_chart(date, categorised_data, hour_minute="", start_hour="", end_hour=
 
     y_pos = np.arange(len(activities))
 
-    ax.set_yticks(y_pos, labels=activities) # , 
+    ax.set_yticks(y_pos, labels=activities) 
     ax.invert_yaxis()
 
     x_ticks_pos = []
@@ -421,37 +250,33 @@ def gantt_chart(date, categorised_data, hour_minute="", start_hour="", end_hour=
     ax.tick_params(axis='x', which='major' , labelsize=5, labelcolor='green')
 
     ########
+    # iterate through db up until second-to-lst entry
+    for i in range(len(db)-1):
+
+        nothing = True
+        
+        time_for_event = to_seconds(db[i][1]) - to_seconds(db[i+1][1])
+        end_time = to_seconds(db[i][1])
+
+        if abs(time_for_event) > 7200:
+            continue
+
+        # eh, not very pythonic, but it's better for consistency with the colour picker and height
+        for j in range(len(activities)):
+            
+            if activities[j] in db[i+1][4]:
+                ax.barh(j, time_for_event, align="edge", left=to_seconds(db[i+1][1]), height=0.3, color=COLORS[j % len(COLORS)])
+                nothing = False
+            
+            if j == len(activities) - 1 and nothing:
+                ax.barh(j, time_for_event, align="edge", left=to_seconds(db[i+1][1]), height=0.3, color=COLORS[j % len(COLORS)])
 
 
-    # looping through dict
-    for i in activities:
-        start = ""
-        end = ""
-        for j in categorised_data[i]:
-            start_or_end, date, time = j
 
-            if start_or_end == "Start":
-                start = to_seconds(time)
-            else:
-                try:
-                    # graph it, and reset counters.
-                    end = to_seconds(time)
-
-                    time_difference = end - start
-
-                    #graphing
-                    ax.barh(y_counter, time_difference, align="edge", left=start, height=0.3, color=COLORS[y_counter % len(COLORS)])
-                    # resetting
-                    start = ""
-                    end = ""
-                except:
-                    pass
-
-        y_counter += 1
-    filepath = "static\\time_spent\\" + date + hour_minute + ".png"
-    if os.path.exists(filepath):
-        print("Replacing existing file", filepath)
-        os.remove(filepath)
+    root_dir = "static\\time_spent\\"
+    filepath = root_dir + date + hour_minute + ".png"
+    # clearing all files in dir, function generates them ad hoc
+    remove_files(root_dir)
     
     if show:
         plt.show()
@@ -512,13 +337,61 @@ def format_time_stamp(time):
     else:
          return (f"{hour}:{minute}:{second}")
 
+def login_required(f):
+    """
+    Decorate routes to require login.
 
-#gantt_chart(today, classify_data(get_db()), show=True, start_hour=8, end_hour=14)
+    https://flask.palletsprojects.com/en/1.1.x/patterns/viewdecorators/
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get("user_id") is None:
+            return redirect("/login")
+        return f(*args, **kwargs)
+    return decorated_function
 
-merge_data(get_db(ascending=True))
+def remove_files(directory):
+    for file in os.scandir(directory):
+        os.remove(file.path)
+    return 0
+
+
+def format_video_notes(sql_selection):
+    new_notes = []
+    for row in sql_selection:
+        intermediary_list = []
+        for j in range(len(row)):
+            # only image links, but they have video id
+            # https://www.youtube.com/watch?v={{ video_id }}
+            # and https://i.ytimg.com/vi/eHYpcXWCkUM/mqdefault.jpg
+            try:
+                # getting link from thumbnail
+                if j == 2:
+                    link = row[j].split("/")
+                    yt_link = "https://www.youtube.com/watch?v=" + link[4]
+                    to_append = [row[j], yt_link]
+                    intermediary_list.append(to_append)
+                
+                # notes in dict format
+                elif j == 7:
+                    # convert string representation of dict to dict
+                    intermediary_list.append(ast.literal_eval(row[j]))
+                else:
+                    intermediary_list.append(row[j])
+                # print(intermediary_list)
+            except Exception as e:
+                print(e)
+        new_notes.append(intermediary_list)
+    
+    return new_notes
+
+# gantt_chart(today, get_db(ascending=True), show=True, start_hour=8, end_hour=20)
+
 
 try:
     update_db()
 # no internet
 except:
     print("No internet. Not fetching new data from TubersLab API")
+
+

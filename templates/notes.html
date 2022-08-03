@@ -15,23 +15,36 @@
 {% block main %}
     <p>&nbsp;</p>
     <form action="/notes" method="post" style="width: 70%; margin : auto;" class="row">
+        <textarea name="title" type="text" style="border-radius: 10px; height: 30px;" class="form-control form-control-lg" placeholder="Title"></textarea>
         <textarea name="note" type="text" style="border-radius: 10px; height: 200px;" class="form-control form-control-lg" placeholder="Add new note..."></textarea>
         <button type="submit" name="submit_note" class="bg-light" style="border-radius: 10px;">Add</button>
     </form>
     <p>&nbsp;</p>
     <hr style="margin: auto; width : 80%;">
     <p>&nbsp;</p>
-    
-    <div style="width: 60%; text-align: center; margin: auto;">
+    <div style="width: 60%; text-align: center; margin: auto;" id="accordion">
         {% for note in notes %}
-            <div id="note" style="border-radius: 20px;" class="card">
-                <div id="text" style="width: 600px; align-self: center;">
-                    <p style="text-align: justify; font-family: Open Sans; font-size: 20px;">
-                        {{ note[1] }}
+            {% if note[6] == 0 %}
+                <h3 class="flex-row" style="font-family: 'Times New Roman', Times, serif; font-size: 20px; border-radius: 10px; border-style:solid; border-color: rgb(189, 189, 189);">
+                    <p>{{ note[3] }}</p>
+                </h3>
+                <div id="text" class="card flex-row" style="width: 600px; margin: auto; border-radius: 20px;">
+                    <p style="text-align: center; font-family: 'Times New Roman', Times, serif; font-size: 20px;">
+                        {{ note[2] }}
                     </p>
-                    <p>&nbsp</p>
+                    <form action="/notes" method="post" >
+                        <button type="submit" value={{ note[0] }} name="delete" class="btn btn-outline-white bg-white" style="float: right">
+                            <img src="/static/button.png" height="14px">
+                        </button>
+                        <select name="folder">
+                            {% for folder in folders %}
+                                <option value="{{ folder[0] }}, {{ note[0] }}">{{ folder[2] }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="bg-light" style="border-radius: 10px;">Add to Folder</button>
+                    </form>
                 </div>
-            </div>
+            {% endif %}
         {% endfor %}
     </div>
 {% endblock %}

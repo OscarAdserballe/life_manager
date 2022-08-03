@@ -14,6 +14,20 @@
         <link href="/static/styles.css" rel="stylesheet">
         <link href="/static/timeline.css" rel="stylesheet">
 
+        <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+
+        <!-- Implementing collapsable div function using Accordion-->
+        <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+        <script>
+            $( function() {
+                $( "#accordion" ).accordion({
+                    heightStyle: "content",
+                    active: false,
+                    collapsible: true
+                });
+            });
+        </script>
+
         <title>Life Manager: {% block title %}{% endblock %}</title>
 
     </head>
@@ -23,7 +37,7 @@
         <nav class="border navbar navbar-expand-md navbar-light">
             <div class="container-fluid">
                 <img src="/static/calendar-icon.png" height="24px">
-                <a class="navbar-brand" href="/">&nbsp&nbsp<span class="green">l</span><span class="red">i</span><span class="cyan">f</span><span class="green">e</span> <span class="blue">m</span><span class="red">an</span>a<span class="green">g</span><span class="blue">e</span>r</a>
+                <a class="navbar-brand" href="/index">&nbsp&nbsp<span class="green">l</span><span class="red">i</span><span class="cyan">f</span><span class="green">e</span> <span class="blue">m</span><span class="red">an</span>a<span class="green">g</span><span class="blue">e</span>r</a>
                 <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbar" data-bs-toggle="collapse" type="button">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -33,6 +47,8 @@
                             <li class="nav-item"><a class="nav-link" href="/task_list">Task list</a></li>
                             <li class="nav-item"><a class="nav-link" href="/time_tracker">Time tracker</a></li>
                             <li class="nav-item"><a class="nav-link" href="/notes">Notes</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/reading_list">Reading List</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/folders">Folders</a></li>
                             
                         </ul>
                         <ul class="navbar-nav ms-auto mt-2">

@@ -15,7 +15,7 @@
         <h4 class="text-uppercase text-letter-spacing-xs my-0 text-primary font-weight-bold text-center">
           Register Event
         </h4>
-        <form action="/" method="post">
+        <form action="/index" method="post">
             <input name="description" placeholder="Event Desc." type="text">
             <input name="date" placeholder="Date" type="date">
             <input name="start" placeholder="Start" type="time">
@@ -29,7 +29,7 @@
           <div class="row">
             {% for calendar_day in calendar %}
               {% if calendar[calendar_day][0] %}
-              <div class="col-lg-4 mb-3" id="Friday, Nov 13th">
+              <div class="col-lg-4 mb-3">
                 <h4 class="mt-0 mb-3 text-muted op-8 font-weight-bold">
   &nbsp&nbsp&nbsp&nbsp<u>{{ calendar_day }}</u>
                 </h4>
@@ -38,7 +38,7 @@
                   {% for entry in calendar[calendar_day][1:] %}
                   <li class="list-timeline-item p-0 pb-3 pb-lg-4 d-flex flex-wrap flex-column">
                       <p class="my-0 flex-fw text-sm text-uppercase text-dark">
-                        {{ entry[1] }} - {{ entry[2] }}
+                        {{ entry[3] }} - {{ entry[4] }}
                       </p>
                   </li>
                   {% endfor %}
@@ -54,7 +54,7 @@
         <h4 class="text-uppercase text-letter-spacing-xs my-0 text-muted font-weight-bold text-center">
             Number of Days Shown
         </h4>
-        <form action="/" method="post">
+        <form action="/index" method="post">
             <input name="days_shown" placeholder="Show Days" type="number">
             <input type="submit" value="Submit" name="register_days">
         </form>     

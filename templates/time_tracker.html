@@ -15,7 +15,7 @@
 {% block main %}
     <div>
         
-            <img src={{ img_src }} width="70%" height="20%">
+            <img src={{ img_src }} width="50%" height="20%" style="margin: auto;">
             <hr style="width: 50%;">
             <p>&nbsp</p>
             <form action = "/time_tracker" method ="get">
@@ -49,10 +49,12 @@
                     }
                 </script>
             {% for entry in show_db %}
-                    <tr onclick="DoNav('{{ entry[5] }}')">     
+                    <tr>     
                         <td>{{ entry[1] }}</td>
                         <td>
-                            <a href="{{ entry[5] }}">
+                            {% if entry[5] %}
+                                <a href="{{ entry[5] }}">
+                            {% endif %}
                             <!--Checking for len first, making sure it doesn't ruin the page.-->
                             {% if 100 > entry[2]|length %}
                                 {{ entry[2] }}

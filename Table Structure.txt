@@ -1,0 +1,79 @@
+**folders**
+
+CREATE TABLE folders (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, user_id INTEGER NOT NULL, name TEXT NOT NULL)
+
+**users**
+
+CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, username TEXT NOT NULL, hash TEXT NOT NULL);
+
+**video_notes**
+
+CREATE TABLE IF NOT EXISTS video_notes (id TEXT NOT NULL, user_id INTEGER NOT NULL, thumbnail TEXT, title TEXT, created DATETIME, updated DATETIME, summary TEXT, notes TEXT PRIMARY KEY, folders TEXT, hide INTEGER)
+
+id here text as copied from json data, which has it as a string.
+
+**calendar**
+
+CREATE TABLE IF NOT EXISTS calendar (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, user_id INTEGER NOT NULL, date TEXT NOT NULL, time NOT NULL, description TEXT NOT NULL)
+
+**task_list**
+
+CREATE TABLE IF NOT EXISTS task_list (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, user_id INTEGER NOT NULL, created DATETIME NOT NULL, task TEXT NOT NULL, done INTEGER NOT NULL, deadline DATETIME)
+
+**notes**
+
+CREATE TABLE IF NOT EXISTS notes (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, user_id INTEGER NOT NULL, note TEXT NOT NULL, title TEXT NOT NULL, created DATETIME NOT NULL, folders TEXT, hide INTEGER NOT NULL)
+
+Datetime format: YYYY-MM-DD hh:mm:ss[.nnn]
+
+folders:
+
+1. id
+2. user_id
+3. name
+
+users:
+
+1. id
+2. username
+3. hash
+
+video_notes
+
+1. id
+2. user_id
+3. thumbnail
+4. title
+5. created
+6. updated
+7. summary
+8. notes PRIMARY KEY (for insert or replace into statement)
+9. folders
+10. hide
+
+calendar
+
+1. id
+2. user_id
+3. date
+4. time
+5. description
+
+task_list
+
+1. id
+2. user_id
+3. created
+4. task
+5. done
+6. deadline
+
+notes
+
+1. id
+2. user_id
+3. note
+4. title
+5. created
+6. folders
+7. hide
