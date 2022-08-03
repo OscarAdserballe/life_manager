@@ -1,16 +1,39 @@
 # Life Manager
-#### Video Demo: https://www.youtube.com/watch?v=URaw8sqPwOM
 #### Description: Productivity Flask App
 
-## Motivation behind the Project
+## Screenshots of Web App
 
-![Homepage](/Demo-screenshots/index-page.png)
+#### Register Page
+![Homepage](/Demo-screenshots/register.png)
+
+#### Login Page
+![Homepage](/Demo-screenshots/login.png)
+
+#### Homepage/Calendar
+![Homepage](/Demo-screenshots/calendar.png)
+
+#### Task List Page
+![Homepage](/Demo-screenshots/task_list.png)
+
+#### Time Tracker Page
+![Homepage](/Demo-screenshots/time-tracker.png)
+
+#### Notes Page
+![Homepage](/Demo-screenshots/Notes.png)
+
+#### Video Notes Page
+![Homepage](/Demo-screenshots/video_notes.png)
+
+#### Folders Page
+![Homepage](/Demo-screenshots/Folders.png)
+
+## Motivation behind the Project
 
 My intention with this project was to create a webapp based on flask that I could use to better manage my day. None of the features developed for this web app are unique, but it's a collection of those things which are useful for me. It's integrated with my chrome extensions in a manner that is not supported by any other apps to my knowledge, or even my time tracker that works across how many devices I choose to support. In no way is it a project that could ever be exported because of this, but it presents a very real personal use cases and it's something I see myself using in the future, perhaps developing it further as my needs change. I could probably have stringed something together that looks similar with a bit of effort in Notion, but this personal project is something I know the ins-and-outs of, while being far more flexible than anything else I might instead use.
 
 Enough with the vague pre-amble... Now I'll actually cover what the project is about in very concrete terms.
 
-## Features
+## Features [Not Updated! See Screenshots for Better View of Current State of Project]
 
 My "life manager" is an app that has 5 distinct features collected in a minimalist website loosely based on the web app developed for problem set 9 with Finance. The app itself is built using Flask, (Python,) HTML, CSS, Bootstrap, JS, sqlite3, while some of the background apps are predominantly made with Python. It includes,
 
