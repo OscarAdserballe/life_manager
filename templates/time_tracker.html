@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Time Tracker
+{% endblock %}
+
+{% block header %}
+    <h2 class="text-uppercase text-letter-spacing-xs my-0 text-primary font-weight-bold">
+        Time Tracker
+    </h2>
+
+    <hr width="70%" style="margin: auto;">
+{% endblock %}
+
+{% block main %}
+    <div>
+        
+            <img src={{ img_src }} width="50%" height="20%" style="margin: auto;">
+            <hr style="width: 50%;">
+            <p>&nbsp</p>
+            <form action = "/time_tracker" method ="get">
+                <p><input type = "date" name = "date"/></p>
+                <p><input type = "submit" value = "Submit" /></p>
+             </form>
+            <hr>
+            <p>&nbsp</p>
+
+            <form action="/time_tracker" method="post">
+                {% for key in ACTIVITIES %}
+                    <input type="submit" name="category" value={{ key }}>
+                {% endfor %}
+            </form>
+            <p>&nbsp</p>
+            <hr style="width: 50%;">
+            <p>&nbsp</p>
+        <table style="margin:auto; width: 70%;" class="table table-striped table-hover table-sm" >
+            <thead>
+                <tr>
+                    <th scope="col">Time</th>
+                    <th scope="col">App</th>
+                    <th scope="col">Activity</th>
+                </tr>
+            </thead>
+            <tbody class="table-hover">
+                <script type="text/javascript">
+                    function DoNav(url)
+                    {
+                        document.location.href = url;
+                    }
+                </script>
+            {% for entry in show_db %}
+                    <tr>     
+                        <td>{{ entry[1] }}</td>
+                        <td>
+                            {% if entry[5] %}
+                                <a href="{{ entry[5] }}">
+                            {% endif %}
+                            <!--Checking for len first, making sure it doesn't ruin the page.-->
+                            {% if 100 > entry[2]|length %}
+                                {{ entry[2] }}
+                            {% else %}
+                                (Too long)
+                            {% endif %}
+                            </a>
+                        </td>
+                        <td> {{ entry[4] }}</td>
+                    
+                    </tr>
+            {% endfor %}
+            </tbody>
+        </table>  
+    </div>
+
+{% endblock %}
